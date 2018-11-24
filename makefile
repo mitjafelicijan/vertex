@@ -17,3 +17,5 @@ publish:
 	git tag v$(VERSION)
 	git push origin --tags
 	goreleaser release --rm-dist
+	cd examples && tar -czf example-project.tar.gz static/ endpoints/
+	cp examples/example-project.tar.gz dist/
