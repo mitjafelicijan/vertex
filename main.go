@@ -34,12 +34,13 @@ var restAPIRoutes map[string]string
 
 func main() {
 
-	fmt.Printf("%v, commit %v, built at %v", version, commit, date)
-
 	fmt.Printf("%s\n\n", strings.Repeat("-", 70))
 
-	fmt.Printf("Build on %s\n", buildTime)
-	fmt.Printf("SHA-1 %s\n\n", sha1ver)
+	fmt.Printf("%v\ncommit %v\nbuilt at %v\n", version, commit, date)
+	//fmt.Printf("Build on %s\n", buildTime)
+	//fmt.Printf("SHA-1 %s\n\n", sha1ver)
+
+	// TODO: if vertex file doesn't exists create boilerplate one
 
 	// parsing config file
 	config = parseConfigFile("vertex.yml")
