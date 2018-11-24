@@ -51,7 +51,6 @@ func clearDatastoreFile(filename string) {
 
 // SetItem -> JS usage: localStorage.setItem('lastname', 'Smith');
 func (ls LocalStorage) SetItem(call otto.FunctionCall) otto.Value {
-
 	key := call.Argument(0).String()
 	value := call.Argument(1).String()
 

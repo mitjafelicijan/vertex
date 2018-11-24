@@ -113,6 +113,40 @@ func main() {
 		})
 	}
 
+	// sandbox console
+	r.HandleFunc("/sandbox", func(w http.ResponseWriter, r *http.Request) {
+		style := "*{font: 14px Arial;}"
+		body := ""
+		//links := []string{}
+
+		for route := range restAPIRoutes {
+			fmt.Println(route)
+			body += fmt.Sprintf("<li><a href='/sandbox/%s'>%s</a></li>", route, route)
+		}
+		w.Header().Set("Content-Type", "text/html")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(fmt.Sprintf("%s <style>%s</style>", body, style)))
+		return
+	})
+
+	// sandbox console
+	r.HandleFunc("/sandbox/{endpoint}", func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		endpoint := vars["endpoint"]
+
+		// read file
+		//endpoint := strings.Replace(r.RequestURI, config.Vertex.Prefix, "", -1)
+		source, err := ioutil.ReadFile(restAPIRoutes[endpoint])
+		if err != nil {
+			panic(err)
+		}
+
+		w.Header().Set("Content-Type", "text/html")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(fmt.Sprintf("<script>%s</script>", string(source))))
+		return
+	})
+
 	// static file server
 	r.Handle("/{url:.*}", http.FileServer(http.Dir(config.Vertex.Static)))
 
@@ -125,7 +159,8 @@ func main() {
 	}
 
 	fmt.Printf("\nWeb application: http://%s:%d", config.Vertex.Host, config.Vertex.Port)
-	fmt.Printf("\nAPI endpoints:   http://%s:%d%s\n\n", config.Vertex.Host, config.Vertex.Port, config.Vertex.Prefix[:(len(config.Vertex.Prefix)-1)])
+	fmt.Printf("\nAPI endpoints:   http://%s:%d%s", config.Vertex.Host, config.Vertex.Port, config.Vertex.Prefix[:(len(config.Vertex.Prefix)-1)])
+	fmt.Printf("\nSandbox env:     http://%s:%d/sandbox\n\n", config.Vertex.Host, config.Vertex.Port)
 	log.Fatal(server.ListenAndServe())
 
 }

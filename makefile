@@ -1,3 +1,4 @@
+VERSION = 0.1
 BUILD_TIME = $(shell date +'%Y.%m.%d-%H:%M:%S')
 SHA1_VER = $(shell git rev-parse HEAD)
 
@@ -11,3 +12,9 @@ build:
 		-ldflags '-extldflags "-static"' \
 		-ldflags '-X main.buildTime=$(BUILD_TIME) -X main.sha1ver=$(SHA1_VER)' \
 		-o dist/vertex
+
+publish:
+	git tag v$(VERSION)
+	git push origin --tags
+	goreleaser --rm-dist
+	

@@ -1,0 +1,33 @@
+build:
+  main: main.go
+  goos:
+    - darwin
+    - linux
+    - windows
+  goarch:
+    - amd64
+    - 386
+    - arm
+    - arm64
+  goarm:
+    - 6
+    - 7
+
+archive:
+  format: tgz
+  format_overrides:
+    - goos: windows
+      format: zip
+  replacements:
+    amd64: 64-bit
+    386: 32-bit
+    darwin: macos
+  files:
+    - readme.md
+    - license
+
+checksum:
+  name_template: "{{ .ProjectName }}_checksum.txt"
+    
+release:
+  draft: true
