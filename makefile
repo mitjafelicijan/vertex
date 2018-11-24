@@ -14,7 +14,7 @@ build:
 		-o dist/vertex
 
 publish:
-	#git tag v$(VERSION)
+	git tag v$(VERSION)
 	#git push origin --tags
 	goreleaser release --skip-publish --rm-dist
 
