@@ -1,0 +1,14 @@
+vertex:
+
+  # server settings
+  host: 0.0.0.0
+  port: 4000
+
+  # database file location
+  datastore: data.json
+
+  # folder for html, css, js
+  static: ./static
+
+  # folder for rest api endpoints
+  rest: ./rest

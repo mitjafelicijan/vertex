@@ -1,13 +1,12 @@
 # Vertex
 
-Core functionalities:
+
+
+
+## Core functionalities:
+
 - Targets ES5
 
-Resources:
-- https://github.com/ry/v8worker2
+## Todo
 
-
-
-## Build V8 engine
-
-git@github.com:ry/v8worker2.git
+- create polyfill for browsers
