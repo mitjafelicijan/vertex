@@ -16,6 +16,12 @@ import (
 	"github.com/robertkrimen/otto/underscore"
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 var sha1ver string
 var buildTime string
 var err error
@@ -27,6 +33,8 @@ var restAPIFiles []string
 var restAPIRoutes map[string]string
 
 func main() {
+
+	fmt.Printf("%v, commit %v, built at %v", version, commit, date)
 
 	fmt.Printf("%s\n\n", strings.Repeat("-", 70))
 

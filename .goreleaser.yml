@@ -1,6 +1,7 @@
 builds:
 - env:
   - CGO_ENABLED=0
+
 archive:
   replacements:
     darwin: Darwin
@@ -11,7 +12,12 @@ archive:
   files:
     - readme.md
     - license
+
 checksum:
   name_template: 'checksums.txt'
+
 snapshot:
   name_template: "{{ .Tag }}-next"
+
+release:
+  draft: true
