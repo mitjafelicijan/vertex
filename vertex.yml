@@ -5,13 +5,13 @@ vertex:
   port: 4001
 
   # api endpoint root
-  root: /api/
+  prefix: /api/
 
   # database file location
   datastore: data.json
 
   # folder for html, css, js
-  static: ./static
+  static: ./examples/static
 
   # folder for rest api endpoints
-  rest: ./examples/rest
+  endpoints: ./examples/endpoints

@@ -6,6 +6,7 @@ run:
 
 build:
 	mkdir -p dist
+	cp vertex.yml dist/
 	CGO_ENABLED=0 GOOS=linux go build -v -a \
 		-ldflags '-extldflags "-static"' \
 		-ldflags '-X main.buildTime=$(BUILD_TIME) -X main.sha1ver=$(SHA1_VER)' \

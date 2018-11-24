@@ -13,10 +13,10 @@ type Config struct {
 	Vertex struct {
 		Host      string `yaml:"host"`
 		Port      int    `yaml:"port"`
-		Root      string `yaml:"root"`
+		Prefix    string `yaml:"prefix"`
 		Datastore string `yaml:"datastore"`
 		Static    string `yaml:"static"`
-		Rest      string `yaml:"rest"`
+		Endpoints string `yaml:"endpoints"`
 	}
 }
 

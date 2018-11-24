@@ -28,9 +28,10 @@ var restAPIRoutes map[string]string
 
 func main() {
 
-	fmt.Println("=================================>")
-	//fmt.Println("Build on", buildTime)
-	//fmt.Println("SHA-1", sha1ver)
+	fmt.Printf("%s\n\n", strings.Repeat("-", 70))
+
+	fmt.Printf("Build on %s\n", buildTime)
+	fmt.Printf("SHA-1 %s\n\n", sha1ver)
 
 	// parsing config file
 	config = parseConfigFile("vertex.yml")
@@ -48,7 +49,7 @@ func main() {
 	vm.Set("localStorage", new(LocalStorage))
 
 	// list all js files in rest folder
-	err := filepath.Walk(config.Vertex.Rest, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(config.Vertex.Endpoints, func(path string, info os.FileInfo, err error) error {
 		restAPIFiles = append(restAPIFiles, path)
 		return nil
 	})
@@ -63,29 +64,34 @@ func main() {
 			routeName := strings.Replace(filepath.Base(file), ".js", "", -1)
 			restAPIRoutes[routeName] = file
 		}
-
 	}
 
 	// declaring router
 	r := mux.NewRouter()
 
+	// api info about datastore and mounted routes
 	r.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
-		restAPIRoutesJSON, _ := json.Marshal(restAPIRoutes)
+		response := make(map[string]interface{})
+		response["routes"] = restAPIRoutes
+		response["datastore"] = readDatastoreFile(config.Vertex.Datastore)
+
+		responseJSON, _ := json.Marshal(response)
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(restAPIRoutesJSON))
+		w.Write([]byte(responseJSON))
 		return
 	})
 
 	// dynamically mount routes
 	for route := range restAPIRoutes {
-		fmt.Println(fmt.Sprintf("Registering route /%s", route))
+		fmt.Printf("Registering route: `%s%s`\n", config.Vertex.Prefix, route)
 
-		r.HandleFunc(fmt.Sprintf("/api/%s", route), func(w http.ResponseWriter, r *http.Request) {
+		r.HandleFunc(fmt.Sprintf("%s%s", config.Vertex.Prefix, route), func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 
 			// read file
-			endpoint := strings.Replace(r.RequestURI, config.Vertex.Root, "", -1)
+			endpoint := strings.Replace(r.RequestURI, config.Vertex.Prefix, "", -1)
 			source, err := ioutil.ReadFile(restAPIRoutes[endpoint])
 			if err != nil {
 				panic(err)
@@ -107,6 +113,9 @@ func main() {
 		})
 	}
 
+	// static file server
+	r.Handle("/{url:.*}", http.FileServer(http.Dir(config.Vertex.Static)))
+
 	// server handler
 	server := &http.Server{
 		Handler:      r,
@@ -115,7 +124,8 @@ func main() {
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Println("Listening on", config.Vertex.Port)
+	fmt.Printf("\nWeb application: http://%s:%d", config.Vertex.Host, config.Vertex.Port)
+	fmt.Printf("\nAPI endpoints:   http://%s:%d%s\n\n", config.Vertex.Host, config.Vertex.Port, config.Vertex.Prefix[:(len(config.Vertex.Prefix)-1)])
 	log.Fatal(server.ListenAndServe())
 
 }
