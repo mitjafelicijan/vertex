@@ -14,3 +14,4 @@
 # App specific
 dist/
 *.json
+makefile
