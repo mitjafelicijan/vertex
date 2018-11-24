@@ -9,9 +9,6 @@ build:
     - 386
     - arm
     - arm64
-  goarm:
-    - 6
-    - 7
 
 archive:
   format: tgz
