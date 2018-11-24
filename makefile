@@ -17,6 +17,3 @@ publish:
 	git tag v$(VERSION)
 	git push origin --tags
 	goreleaser release --rm-dist
-
-#goreleaser release --skip-publish --rm-dist
-#goreleaser --rm-dist

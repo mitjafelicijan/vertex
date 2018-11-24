@@ -35,12 +35,12 @@ var restAPIRoutes map[string]string
 func main() {
 
 	fmt.Printf("%s\n\n", strings.Repeat("-", 70))
+	fmt.Printf("Version:    Vertex - Mock REST API's the easy way\n")
+	fmt.Printf("Repository: https://github.com/mitjafelicijan/vertex\n\n")
 
-	fmt.Printf("%v\ncommit %v\nbuilt at %v\n", version, commit, date)
-	//fmt.Printf("Build on %s\n", buildTime)
-	//fmt.Printf("SHA-1 %s\n\n", sha1ver)
-
-	// TODO: if vertex file doesn't exists create boilerplate one
+	fmt.Printf("Version:  %v\n", version)
+	fmt.Printf("Built at: %v\n", date)
+	fmt.Printf("SHA-1:    %v\n\n", commit)
 
 	// parsing config file
 	config = parseConfigFile("vertex.yml")
@@ -93,8 +93,9 @@ func main() {
 	})
 
 	// dynamically mount routes
+	fmt.Printf("Mounting routes:\n")
 	for route := range restAPIRoutes {
-		fmt.Printf("Registering route: `%s%s`\n", config.Vertex.Prefix, route)
+		fmt.Printf(" ↳ Registering route: `%s%s`\n", config.Vertex.Prefix, route)
 
 		r.HandleFunc(fmt.Sprintf("%s%s", config.Vertex.Prefix, route), func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
