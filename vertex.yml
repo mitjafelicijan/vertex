@@ -2,7 +2,10 @@ vertex:
 
   # server settings
   host: 0.0.0.0
-  port: 4000
+  port: 4001
+
+  # api endpoint root
+  root: /api/
 
   # database file location
   datastore: data.json
@@ -11,4 +14,4 @@ vertex:
   static: ./static
 
   # folder for rest api endpoints
-  rest: ./rest
+  rest: ./examples/rest

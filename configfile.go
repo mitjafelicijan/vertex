@@ -13,6 +13,7 @@ type Config struct {
 	Vertex struct {
 		Host      string `yaml:"host"`
 		Port      int    `yaml:"port"`
+		Root      string `yaml:"root"`
 		Datastore string `yaml:"datastore"`
 		Static    string `yaml:"static"`
 		Rest      string `yaml:"rest"`
@@ -20,7 +21,6 @@ type Config struct {
 }
 
 func parseConfigFile(filename string) Config {
-
 	yamlFile, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Println("Error reading config file")
