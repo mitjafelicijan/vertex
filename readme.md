@@ -13,6 +13,8 @@ Just point Vertex into folder where you have your static HTML app and endpoints 
 - embedded JavaScript interpreter so you can write endpoints in Javascript,
 - localStorage implementation that stores everything into JSON file.
 
+[Watch this short video](https://www.youtube.com/watch?v=hs19-_Xk9R0) to get the gist of it.
+
 
 **Table of contents**
 - [Installation](#installation)
