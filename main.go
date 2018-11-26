@@ -22,6 +22,15 @@ var (
 	date    = "unknown"
 )
 
+// Route ...
+type Route struct {
+	Method   string
+	Filepath string
+	Source   string
+}
+
+//var restAPIRoutes map[string]string
+var restAPIRoutes map[string]Route
 var sha1ver string
 var buildTime string
 var err error
@@ -30,13 +39,12 @@ var vm *otto.Otto
 var config Config
 
 var restAPIFiles []string
-var restAPIRoutes map[string]string
 
 func main() {
 
 	fmt.Printf("%s\n\n", strings.Repeat("-", 70))
-	fmt.Printf("Version:    Vertex - Mock REST API's the easy way\n")
-	fmt.Printf("Repository: https://github.com/mitjafelicijan/vertex\n\n")
+	fmt.Printf("Vertex - Mock REST API's the easy way\n")
+	fmt.Printf("https://github.com/mitjafelicijan/vertex\n\n")
 
 	fmt.Printf("Version:  %v\n", version)
 	fmt.Printf("Built at: %v\n", date)
@@ -67,11 +75,28 @@ func main() {
 	}
 
 	// parsing available rest api endpoints
-	restAPIRoutes = make(map[string]string)
+	restAPIRoutes = make(map[string]Route)
 	for _, file := range restAPIFiles {
 		if strings.Contains(file, ".js") {
-			routeName := strings.Replace(filepath.Base(file), ".js", "", -1)
-			restAPIRoutes[routeName] = file
+			pathParts := strings.Split(file, "/")
+
+			routeName := pathParts[len(pathParts)-2]
+			routeMethod := strings.Replace(filepath.Base(file), ".js", "", -1)
+
+			source, err := ioutil.ReadFile(file)
+			if err != nil {
+				panic(err)
+			}
+
+			// replaces unsupported methods
+			routeSource := transcode(string(source))
+
+			//restAPIRoutes[routeName] = file
+			restAPIRoutes[routeName+":"+routeMethod] = Route{
+				Filepath: file,
+				Method:   routeMethod,
+				Source:   routeSource,
+			}
 		}
 	}
 
@@ -95,67 +120,20 @@ func main() {
 	// dynamically mount routes
 	fmt.Printf("Mounting routes:\n")
 	for route := range restAPIRoutes {
-		fmt.Printf(" ↳ Registering route: `%s%s`\n", config.Vertex.Prefix, route)
+		displayRoute := strings.Split(route, ":")
+		fmt.Printf(" ↳ http://%s:%d%s%s [%s]\n", config.Vertex.Host, config.Vertex.Port, config.Vertex.Prefix, displayRoute[0], displayRoute[1])
 
-		r.HandleFunc(fmt.Sprintf("%s%s", config.Vertex.Prefix, route), func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
+		switch restAPIRoutes[route].Method {
+		case "get":
+			r.HandleFunc(fmt.Sprintf("%s%s", config.Vertex.Prefix, displayRoute[0]), getHandler).Methods("GET")
+			break
 
-			// read file
-			endpoint := strings.Replace(r.RequestURI, config.Vertex.Prefix, "", -1)
-			source, err := ioutil.ReadFile(restAPIRoutes[endpoint])
-			if err != nil {
-				panic(err)
-			}
+		case "post":
+			r.HandleFunc(fmt.Sprintf("%s%s", config.Vertex.Prefix, displayRoute[0]), postPutDeleteHandler).Methods("POST", "PUT", "DELETE")
+			break
+		}
 
-			// replaces unsupported methods
-			routeSource := transcode(string(source))
-
-			// executes script
-			response, err := vm.Run(routeSource)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(response.String()))
-			return
-		})
 	}
-
-	// sandbox console
-	r.HandleFunc("/sandbox", func(w http.ResponseWriter, r *http.Request) {
-		style := "*{font: 14px Arial;}"
-		body := ""
-		//links := []string{}
-
-		for route := range restAPIRoutes {
-			fmt.Println(route)
-			body += fmt.Sprintf("<li><a href='/sandbox/%s'>%s</a></li>", route, route)
-		}
-		w.Header().Set("Content-Type", "text/html")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(fmt.Sprintf("%s <style>%s</style>", body, style)))
-		return
-	})
-
-	// sandbox console
-	r.HandleFunc("/sandbox/{endpoint}", func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		endpoint := vars["endpoint"]
-
-		// read file
-		//endpoint := strings.Replace(r.RequestURI, config.Vertex.Prefix, "", -1)
-		source, err := ioutil.ReadFile(restAPIRoutes[endpoint])
-		if err != nil {
-			panic(err)
-		}
-
-		w.Header().Set("Content-Type", "text/html")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(fmt.Sprintf("<script>%s</script>", string(source))))
-		return
-	})
 
 	// static file server
 	r.Handle("/{url:.*}", http.FileServer(http.Dir(config.Vertex.Static)))
@@ -169,8 +147,8 @@ func main() {
 	}
 
 	fmt.Printf("\nWeb application: http://%s:%d", config.Vertex.Host, config.Vertex.Port)
-	fmt.Printf("\nAPI endpoints:   http://%s:%d%s", config.Vertex.Host, config.Vertex.Port, config.Vertex.Prefix[:(len(config.Vertex.Prefix)-1)])
-	fmt.Printf("\nSandbox env:     http://%s:%d/sandbox\n\n", config.Vertex.Host, config.Vertex.Port)
+	fmt.Printf("\nAPI endpoints:   http://%s:%d%s\n\n", config.Vertex.Host, config.Vertex.Port, config.Vertex.Prefix[:(len(config.Vertex.Prefix)-1)])
+	//fmt.Printf("\nSandbox env:     http://%s:%d/sandbox\n\n", config.Vertex.Host, config.Vertex.Port)
 	log.Fatal(server.ListenAndServe())
 
 }

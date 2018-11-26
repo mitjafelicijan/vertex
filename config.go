@@ -42,8 +42,7 @@ func parseConfigFile(filename string) Config {
 	yamlFile, err := ioutil.ReadFile(filename)
 	if err != nil {
 
-		err = ioutil.WriteFile(filename, []byte(configTemplate), 0644)
-		if err != nil {
+		if ioutil.WriteFile(filename, []byte(configTemplate), 0644) != nil {
 			panic("Fatal error creating config file\n")
 			os.Exit(1)
 		}

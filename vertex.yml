@@ -11,7 +11,7 @@ vertex:
   datastore: data.json
   
   # folder for html, css, js
-  static: ./static
+  static: ./examples/static
   
   # folder for rest api endpoints
   endpoints: ./examples/endpoints
