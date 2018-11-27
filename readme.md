@@ -103,5 +103,7 @@ You can use [Underscore.js](https://underscorejs.org/) in your endpoints. It is 
 
 ## Limitations
 
-- Targets ES5, no ES6 support currently
-- Limited JS usage with no window object.
+- "use strict" will parse, but does nothing.
+- The regular expression engine (re2/regexp) is not fully compatible with the ECMA5 specification.
+- Targets ES5. ES6 features (eg: Typed Arrays) are not supported.
+- No windows object so no setTimeout/setInterval support.
